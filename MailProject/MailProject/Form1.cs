@@ -15,21 +15,12 @@ namespace MailProject
     {
         static mailServer s = mailServer.GMAIL;
 
-        private TcpClient Client;
-        //private NetworkStream Stream;
-        //private StreamReader Reader;
-        //private StreamWriter Writer;
-
         private String SmtpServer = "smtp.gmail.com";
         private int SMTPPort = 465;
+
         public Form1()
         {
             InitializeComponent();
-
-            Client = new TcpClient(SmtpServer, SMTPPort);
-            //Stream = Client.GetStream();
-            //Reader = new StreamReader(Stream);
-            //Writer = new StreamWriter(Stream);
         }
 
         public static void setMailServer(mailServer a)
@@ -41,92 +32,30 @@ namespace MailProject
             return s;
         }
 
-        private void ConnectServer()
-        {
-            if (Client.Connected)
-            {
-                Client.Close();
-                //SSLStream.Close();
-                //Stream.Close();
-                //Reader.Close();
-                //Writer.Close();
-            }
-
-            switch (s)
-            {
-                case mailServer.GMAIL:
-                    SmtpServer = "smtp.gmail.com";
-                    SMTPPort = 587;
-                    break;
-                case mailServer.NAVER:
-                    SmtpServer = "smtp.naver.com";
-                    SMTPPort = 587;
-                    break;
-            }
-            Client.Connect(SmtpServer, SMTPPort);
-            //SSLStream = new SslStream(Client.GetStream());
-            //SSLStream.AuthenticateAsClient(SmtpServer);
-
-            //Stream = Client.GetStream();
-            //Reader = new StreamReader(Stream);
-            //Writer = new StreamWriter(Stream);
-        }
-        private void sendMessage(string message)
-        {
-            // SSLStream.Write(Encoding.UTF8.GetBytes(message));
-            //SSLStream.Flush();
-
-            //Writer.WriteLine(message);
-            //Writer.Flush();
-            //return Reader.ReadLine();
-        }
-        private String returnMessage(StreamReader reader)
-        {
-            string str = string.Empty;
-            string strTemp = string.Empty;
-            while ((strTemp = reader.ReadLine()) != null)
-            {
-                // find the . character in line
-                if (strTemp == ".")
-                {
-                    break;
-                }
-                if (strTemp.IndexOf("-ERR") != -1)
-                {
-                    break;
-                }
-                str += strTemp;
-            }
-
-            return str;
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
+            TcpClient Client = new TcpClient(SmtpServer, SMTPPort);
+            Thread.Sleep(500);
+
+            System.Net.Security.SslStream sslstream = new SslStream(Client.GetStream());
+            Thread.Sleep(500);
+
+            sslstream.AuthenticateAsClient(SmtpServer);
+            Thread.Sleep(500);
+
+            StreamWriter sw = new StreamWriter(sslstream);
+            StreamReader reader = new StreamReader(sslstream);
+            Thread.Sleep(500);
+
             try
             {
-                //ConnectServer();
-
-                byte[] buffer;
-                string str = string.Empty;
+                string str;
                 string strTemp;
-
-
-                System.Net.Security.SslStream sslstream = new SslStream(Client.GetStream());
-                Thread.Sleep(500);
-
-                sslstream.AuthenticateAsClient(SmtpServer);
-                Thread.Sleep(500);
-
-                StreamWriter sw = new StreamWriter(sslstream);
-                StreamReader reader = new StreamReader(sslstream);
-                Thread.Sleep(500);
 
                 // refer POP rfc command, there very few around 6-9 command
                 sw.WriteLine("EHLO " + "smtp.gmail.com");
                 sw.Flush();
                 Thread.Sleep(500);
-
 
                 sw.WriteLine("AUTH LOGIN");
                 sw.Flush();
@@ -181,9 +110,8 @@ namespace MailProject
                     {
                         break;
                     }
-                    str += strTemp;
+                    str += strTemp + "\n";
                 }
-
 
                 MessageBox.Show("메일 전송에 성공했습니다.", "전송 성공");
             }
@@ -191,6 +119,11 @@ namespace MailProject
             {
                 MessageBox.Show("메일 전송에 실패했습니다.", "전송 실패");
             }
+
+            Client.Close();
+            sslstream.Close();
+            sw.Close();
+            reader.Close();
         }
 
         private void button2_Click(object sender, EventArgs e)
