@@ -33,37 +33,35 @@
             Mail_Text = new TextBox();
             button1 = new Button();
             OpenServerSelect = new Button();
-            Console = new TextBox();
             SuspendLayout();
             // 
             // Mail_Subject
             // 
-            Mail_Subject.Location = new Point(102, 112);
+            Mail_Subject.Location = new Point(32, 21);
             Mail_Subject.Name = "Mail_Subject";
-            Mail_Subject.Size = new Size(437, 23);
+            Mail_Subject.PlaceholderText = "제목을 입력해주세요.";
+            Mail_Subject.Size = new Size(404, 23);
             Mail_Subject.TabIndex = 0;
-            Mail_Subject.Text = "제목을 입력해주세요.";
-            Mail_Subject.TextChanged += textBox1_TextChanged;
             // 
             // Mail_Receiver
             // 
-            Mail_Receiver.Location = new Point(102, 167);
+            Mail_Receiver.Location = new Point(32, 61);
             Mail_Receiver.Name = "Mail_Receiver";
-            Mail_Receiver.Size = new Size(437, 23);
+            Mail_Receiver.PlaceholderText = "수신자의 메일 주소를 입력해주세요.";
+            Mail_Receiver.Size = new Size(404, 23);
             Mail_Receiver.TabIndex = 1;
-            Mail_Receiver.Text = "수신자의 메일 주소를 입력해주세요.";
             // 
             // Mail_Text
             // 
-            Mail_Text.Location = new Point(32, 226);
+            Mail_Text.Location = new Point(32, 112);
             Mail_Text.Multiline = true;
             Mail_Text.Name = "Mail_Text";
-            Mail_Text.Size = new Size(507, 298);
+            Mail_Text.Size = new Size(507, 273);
             Mail_Text.TabIndex = 2;
             // 
             // button1
             // 
-            button1.Location = new Point(439, 561);
+            button1.Location = new Point(439, 541);
             button1.Name = "button1";
             button1.Size = new Size(100, 45);
             button1.TabIndex = 3;
@@ -73,27 +71,19 @@
             // 
             // OpenServerSelect
             // 
-            OpenServerSelect.Location = new Point(430, 22);
+            OpenServerSelect.Location = new Point(455, 21);
             OpenServerSelect.Name = "OpenServerSelect";
-            OpenServerSelect.Size = new Size(109, 61);
+            OpenServerSelect.Size = new Size(84, 63);
             OpenServerSelect.TabIndex = 4;
             OpenServerSelect.Text = "서버 선택";
             OpenServerSelect.UseVisualStyleBackColor = true;
             OpenServerSelect.Click += button2_Click;
-            // 
-            // Console
-            // 
-            Console.Location = new Point(24, 19);
-            Console.Name = "Console";
-            Console.Size = new Size(251, 23);
-            Console.TabIndex = 5;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(572, 618);
-            Controls.Add(Console);
             Controls.Add(OpenServerSelect);
             Controls.Add(button1);
             Controls.Add(Mail_Text);
@@ -112,6 +102,5 @@
         private TextBox Mail_Text;
         private Button button1;
         private Button OpenServerSelect;
-        private TextBox Console;
     }
 }

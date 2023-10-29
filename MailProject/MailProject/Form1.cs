@@ -1,6 +1,9 @@
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Threading;
 using System.Text;
 using System.Windows.Forms;
 
@@ -13,20 +16,20 @@ namespace MailProject
         static mailServer s = mailServer.GMAIL;
 
         private TcpClient Client;
-        private NetworkStream Stream;
-        private StreamReader Reader;
-        private StreamWriter Writer;
+        //private NetworkStream Stream;
+        //private StreamReader Reader;
+        //private StreamWriter Writer;
 
-        private String SmtpServer;
-        private int SMTPPort;
+        private String SmtpServer = "smtp.gmail.com";
+        private int SMTPPort = 465;
         public Form1()
         {
             InitializeComponent();
 
-            Client = new TcpClient("smtp.gmail.com", 587);
-            Stream = Client.GetStream();
-            Reader = new StreamReader(Stream);
-            Writer = new StreamWriter(Stream);
+            Client = new TcpClient(SmtpServer, SMTPPort);
+            //Stream = Client.GetStream();
+            //Reader = new StreamReader(Stream);
+            //Writer = new StreamWriter(Stream);
         }
 
         public static void setMailServer(mailServer a)
@@ -43,9 +46,10 @@ namespace MailProject
             if (Client.Connected)
             {
                 Client.Close();
-                Stream.Close();
-                Reader.Close();
-                Writer.Close();
+                //SSLStream.Close();
+                //Stream.Close();
+                //Reader.Close();
+                //Writer.Close();
             }
 
             switch (s)
@@ -59,88 +63,129 @@ namespace MailProject
                     SMTPPort = 587;
                     break;
             }
-            Client = new TcpClient(SmtpServer, SMTPPort);
-            Stream = Client.GetStream();
-            Reader = new StreamReader(Stream);
-            Writer = new StreamWriter(Stream);
+            Client.Connect(SmtpServer, SMTPPort);
+            //SSLStream = new SslStream(Client.GetStream());
+            //SSLStream.AuthenticateAsClient(SmtpServer);
+
+            //Stream = Client.GetStream();
+            //Reader = new StreamReader(Stream);
+            //Writer = new StreamWriter(Stream);
         }
-        private String sendMessage(string message)
+        private void sendMessage(string message)
         {
-            Writer.WriteLine(message);
-            Writer.Flush();
-            return Reader.ReadLine();
+            // SSLStream.Write(Encoding.UTF8.GetBytes(message));
+            //SSLStream.Flush();
+
+            //Writer.WriteLine(message);
+            //Writer.Flush();
+            //return Reader.ReadLine();
         }
-
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private String returnMessage(StreamReader reader)
         {
+            string str = string.Empty;
+            string strTemp = string.Empty;
+            while ((strTemp = reader.ReadLine()) != null)
+            {
+                // find the . character in line
+                if (strTemp == ".")
+                {
+                    break;
+                }
+                if (strTemp.IndexOf("-ERR") != -1)
+                {
+                    break;
+                }
+                str += strTemp;
+            }
 
+            return str;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                ConnectServer();
+                //ConnectServer();
 
                 byte[] buffer;
-                String str;
+                string str = string.Empty;
+                string strTemp;
 
 
+                System.Net.Security.SslStream sslstream = new SslStream(Client.GetStream());
+                Thread.Sleep(500);
 
-                str = "HELO " + SmtpServer + "\r\n";
-                Console.Text = sendMessage(str);
-                //buffer = Encoding.ASCII.GetBytes(str);
-                //Stream.Write(buffer, 0, buffer.Length);
+                sslstream.AuthenticateAsClient(SmtpServer);
+                Thread.Sleep(500);
 
-                //str = "EHLO " + SmtpServer + "\r\n";
-                //Console.Text = sendMessage(str);
+                StreamWriter sw = new StreamWriter(sslstream);
+                StreamReader reader = new StreamReader(sslstream);
+                Thread.Sleep(500);
 
-                str = "AUTH LOGIN\r\n";
-                Console.Text = sendMessage(str);
-
-                str = "Y29tbmVwcm84QGdtYWlsLmNvbQ==\r\n";
-                //Writer.WriteLine(Convert.ToBase64String(Encoding.UTF8.GetBytes(str)));
-                //Writer.Flush();
-                //Console.Text =  Reader.ReadLine();
-
-                Console.Text = sendMessage(str);
-
-                str = "ZGpud2RyYmxsamN2YWFvZw==\r\n";
-                Console.Text = sendMessage(str);
-                //Writer.WriteLine(Convert.ToBase64String(Encoding.UTF8.GetBytes(str)));
-                //Writer.Flush();
-                //Console.Text = Reader.ReadLine();
-
-                str = "MAIL FROM: " + "<" + "comnepro8@gmail.com" + ">\r\n";
-                Console.Text = sendMessage(str);
-
-                str = "RCPT TO: " + "<" + Mail_Receiver.Text + ">\r\n";
-                Console.Text = sendMessage(str);
-
-                str = "DATA: " + "\r\n";
-                Console.Text = sendMessage(str);
-
-                str = "SUBJECT: " + Mail_Subject.Text + "\r\n" + Mail_Text.Text + "\r\n" + "." + "\r\n";
-                Console.Text = sendMessage(str);
-
-                str = "QUIT\r\n";
-                Console.Text = sendMessage(str);
+                // refer POP rfc command, there very few around 6-9 command
+                sw.WriteLine("EHLO " + "smtp.gmail.com");
+                sw.Flush();
+                Thread.Sleep(500);
 
 
-                //SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-                //smtp.EnableSsl = true; // SSL 사용
-                //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                sw.WriteLine("AUTH LOGIN");
+                sw.Flush();
+                Thread.Sleep(500);
 
-                // 아웃룩, Live 또는 Hotmail의 계정과 암호를 지정
-                //smtp.Credentials = new NetworkCredential("limesarudsa@gmail.com", "qgvq einr nsdo qxoj");
+                sw.WriteLine(Convert.ToBase64String(Encoding.UTF8.GetBytes("comnepro8@gmail.com")));
+                sw.Flush();
+                Thread.Sleep(500);
 
-                //MailMessage msg = new MailMessage("limesaru@gmail.com", Mail_Receiver.Text, Mail_Subject.Text, Mail_Text.Text);
-                //msg.IsBodyHtml = true;
-                //msg.SubjectEncoding = Encoding.UTF8;
-                //msg.BodyEncoding = Encoding.UTF8;
+                sw.WriteLine(Convert.ToBase64String(Encoding.UTF8.GetBytes("djnwdrblljcvaaog")));
+                sw.Flush();
+                Thread.Sleep(500);
 
-                //smtp.Send(msg);
+                sw.WriteLine("MAIL FROM:<" + "comnepro8@gmail.com" + ">");
+                sw.Flush();
+                Thread.Sleep(500);
+
+                sw.WriteLine("RCPT TO:<" + Mail_Receiver.Text + ">");
+                sw.Flush();
+                Thread.Sleep(500);
+
+                sw.WriteLine("DATA");
+                sw.Flush();
+                Thread.Sleep(500);
+
+                sw.WriteLine("Subject: " + Mail_Subject.Text);
+                sw.Flush();
+                Thread.Sleep(500);
+
+                sw.WriteLine(Mail_Text.Text);
+                sw.Flush();
+                Thread.Sleep(500);
+
+                sw.WriteLine(".");
+                sw.Flush();
+                Thread.Sleep(500);
+
+                sw.WriteLine("QUIT");
+                sw.Flush();
+                Thread.Sleep(500);
+
+                str = string.Empty;
+                strTemp = string.Empty;
+                while ((strTemp = reader.ReadLine()) != null)
+                {
+                    // find the . character in line
+                    if (strTemp == ".")
+                    {
+                        break;
+                    }
+                    if (strTemp.IndexOf("-ERR") != -1)
+                    {
+                        break;
+                    }
+                    str += strTemp;
+                }
+
+
+                MessageBox.Show("메일 전송에 성공했습니다.", "전송 성공");
             }
             catch (Exception ex)
             {
