@@ -74,20 +74,23 @@ public class MailClient2 extends JFrame {
         sendingButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (recipientb.getText().equals("")) {
+                    if (recipientb.getText().equals("") || recipientb.getText().contains("@") == false) {
                         new dia2("수신자의 성함이 올바르지 않습니다. :(");
                         return;
-                    } else if (subjectb.getText().equals("")) {
+                    } 
+                    else if (subjectb.getText().equals("")) {
                         new dia2("제목을 적어주십시오. :(");
                         return;
-                    } else {
+                    }
+                    else {
                         MailServer2.sendMail(recipientb.getText(), subjectb.getText(), contentb.getText(), attachmentPathField.getText());
                         recipientb.setText("");
                         subjectb.setText("");
                         contentb.setText("");
                         attachmentPathField.setText("");
                     }
-                } catch (Exception ex) {
+                } 
+                catch (Exception ex) {
                     System.out.println("Something is wrong");
                     return;
                 }
