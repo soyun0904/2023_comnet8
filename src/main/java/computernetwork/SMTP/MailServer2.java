@@ -17,6 +17,7 @@ class MailServer2 {
     private static String password;
 
     public static void sendMail(String recipient, String subject, String content, String filePath) throws Exception {
+        try {
         String user = "comnepro8@gmail.com";    //보내는 사람 이메일
         String pass = "djnwdrblljcvaaog";   //보내는 사람 비밀번호
 
@@ -38,6 +39,19 @@ class MailServer2 {
         br.close(); //버퍼 닫기
         dos.close();    //스트림 닫기
         sock.close();   // 소켓 닫기 - connection 끊기
+        
+        new dia();    //메일 전송이 완료되었을 경우 "메일 전송이 완료되었습니다! :D 출력
+    }
+        catch(IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
+            new dia2("메일 전송 중 오류가 발생하였습니다. :(");
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e);
+            new dia2("메일 전송 중 오류가 발생하였습니다. :(");
+        }
     }
 
     private static void sendMailWithAttachment(String recipient, String subject, String content, String filePath, BufferedReader br, DataOutputStream dos) throws Exception {   //첨부파일이 포함된 이메일 전송
@@ -65,25 +79,20 @@ class MailServer2 {
         readResponse(br);
         
         send("To: " + recipient + "\r\n");  //수신자 지정 헤더
-        //readResponse(br);
+        
 
         send("Subject: " + subject + "\r\n");   //메일 제목 지정 헤더
-        //readResponse(br);
-
-        // Headers
+       
         send("MIME-Version: 1.0\r\n");  //MIME버전 명시
         
         send("Content-Type: multipart/mixed; boundary=" + boundary + "\r\n");   //이메일에 본문 내용과 첨부 파일 내용을 구분하기 위해 이를 알림, boundary : 각 부분을 구분하는 문자열
-        
-        // Text
+    
         send("--" + boundary + "\r\n"); //첫번째 경계 문자열
         
         send("Content-Type: text/plain; charset=UTF-8\r\n\r\n");    //본문 내용 형식은 text, 문자 인코딩은 UTF-8 임을 알림
         
         send(content + "\r\n"); //이메일 본문 내용 전송
     
-
-        // Attachment
         File file = new File(filePath); //첨부파일의 경로를 바탕으로 파일 객체 생성
         FileInputStream fis = new FileInputStream(file);    //첨부 파일 읽기 위한 'FileInputStream'객체 생성
         byte[] fileBytes = new byte[(int) file.length()];   //파일의 내용을 바이트 배열로 읽어 들이고 파일 입력 스트림 닫음
@@ -132,13 +141,10 @@ class MailServer2 {
         
         send("To: " + recipient + "\r\n");
         
-
         send("Subject: " + subject + "\r\n");
        
-
         send(content + "\r\n");
         
-
         send(".\r\n");
         readResponse(br);
         
