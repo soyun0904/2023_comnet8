@@ -114,7 +114,7 @@ class MailServer2 {
         readResponse(br);
         
         send("QUIT\r\n");   //SMTP 세션을 종료하고 연결을 닫겠다는 것을 SMTP 서버에 알림
-        readResponseQuit(br);    //QUIT응답을 통해 메일이 정상적으로 전송됐는지 확인
+        readResponse(br);    //QUIT응답을 통해 메일이 정상적으로 전송됐는지 확인
     }
 
     private static void sendMailWithoutAttachment(String recipient, String subject, String content, BufferedReader br, DataOutputStream dos) throws Exception { //첨부파일이 없을 때 이메일 전송
@@ -149,7 +149,7 @@ class MailServer2 {
         readResponse(br);
         
         send("QUIT\r\n");
-        readResponseQuit(br);
+        readResponse(br);
     }
 
     private static void send(String s) throws Exception {
@@ -163,11 +163,4 @@ class MailServer2 {
         System.out.println("SERVER: " + line);  //서버로부터 받은 응답을 출력
     }
 
-    private static void readResponseQuit(BufferedReader br) throws Exception {
-        String line = br.readLine();
-        System.out.println("SERVER: " + line);
-        if (line == null || !line.startsWith("250 2.0.0 OK")) {    //QUIT응답의 앞 부분이 "250 2.0.0 OK"가 아닐 경우 메일이 정상적으로 전송되지 않음
-            throw new Exception("메일 전송에 실패했습니다.");
-        }
-    }
 }
