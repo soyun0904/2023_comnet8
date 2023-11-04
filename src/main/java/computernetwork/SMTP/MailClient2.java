@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MailClient2 extends JFrame {
-    JLabel recipientf = new JLabel("받는 사람");
+	JLabel recipientf = new JLabel("받는 사람");
     JTextField recipientb = new JTextField();
     JLabel subjectf = new JLabel("제목");
     JTextField subjectb = new JTextField();
@@ -58,6 +58,7 @@ public class MailClient2 extends JFrame {
         browseButton.setLocation(470, 260);
         browseButton.setSize(80, 30);
         browseButton.addActionListener(new ActionListener() {
+        	//파일탐색기 처리
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Files", "jpg", "png", "pdf", "txt");
@@ -72,17 +73,22 @@ public class MailClient2 extends JFrame {
 
         JButton sendingButton = new JButton("전송");
         sendingButton.addActionListener(new ActionListener() {
+        	//버튼이 눌렸을때 이벤트 리스너
             public void actionPerformed(ActionEvent e) {
                 try {
+                	//받는 사람 칸이 비어있거나 @가 포함되지 않으면 오류 출력
                     if (recipientb.getText().equals("") || recipientb.getText().contains("@") == false) {
                         new dia2("수신자의 성함이 올바르지 않습니다. :(");
                         return;
                     } 
+                    //제목 칸이 비어있으면 오류 출력
                     else if (subjectb.getText().equals("")) {
                         new dia2("제목을 적어주십시오. :(");
                         return;
                     }
+                    //비정상 입력이 없으면 메일 발송
                     else {
+                    	//메일 발송을 처리할 함수로 발는 사람, 제목, 내용, 파일경로 넘겨줌
                         MailServer2.sendMail(recipientb.getText(), subjectb.getText(), contentb.getText(), attachmentPathField.getText());
                         recipientb.setText("");
                         subjectb.setText("");
@@ -90,8 +96,12 @@ public class MailClient2 extends JFrame {
                         attachmentPathField.setText("");
                     }
                 } 
+                //메일 발송중 예외 발생시 예외처리
                 catch (Exception ex) {
-                    System.out.println("Something is wrong");
+                	//예외 스택 트레이스 출력
+                    ex.printStackTrace(); 
+                    //예외 메시지 출력
+                    System.out.println("Error: " + ex.getMessage());  
                     return;
                 }
             }
